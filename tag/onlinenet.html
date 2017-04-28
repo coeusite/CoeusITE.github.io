@@ -2,9 +2,9 @@
 <html lang="cn">
 <head>
         <meta charset="utf-8" />
-        <title>CosueITE Closet - Online.net</title>
+        <title>CosueITE's Closet - Online.net</title>
         <link rel="stylesheet" href="../theme/css/main.css" />
-        <link href="https://lettuce.schwarzdot.eu.org/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="CosueITE Closet Atom Feed" />
+        <link href="https://lettuce.schwarzdot.eu.org/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="CosueITE's Closet Atom Feed" />
 
         <!--[if IE]>
             <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -13,7 +13,7 @@
 
 <body id="index" class="home">
         <header id="banner" class="body">
-                <h1><a href="../">CosueITE Closet </a></h1>
+                <h1><a href="../">CosueITE's Closet </a></h1>
                 <nav><ul>
                     <li><a href="../category/server.html">Server</a></li>
                 </ul></nav>
@@ -40,8 +40,8 @@
 买后犹豫再三，还是安装了 Fedora 24 而非 Centos 7 或 Debian 8，原因大约是 Fedora 更新快。</p>
 <p>后来，Online.net 又开卖 Limited Dediboxes，没忍住换了一个E3/2TB的，系统更新为 Fedora 25。</p>
 <p>言归正传，下面开始部署 Docker。</p>
-<p>== Docker 安装
-Check https://fedoraproject.org/wiki/Docker for details!</p>
+<h1>Docker 安装</h1>
+<p>Check https://fedoraproject.org/wiki/Docker for details!</p>
 <p>首先更新个系统:</p>
 <div class="highlight"><pre><span></span>sudo dnf -y update
 </pre></div>
@@ -76,7 +76,7 @@ sudo systemctl <span class="nb">enable</span> --now docker
 </pre></div>
 
 
-<p>== 安装各个应用</p>
+<h2>安装各个应用</h2>
 <p>显示目前运行的容器:</p>
 <div class="highlight"><pre><span></span>sudo docker info
 </pre></div>
@@ -87,8 +87,8 @@ sudo systemctl <span class="nb">enable</span> --now docker
 </pre></div>
 
 
-<p>=== 安装 Nginx Proxy 和 Lets-Encrypt
-Check https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion for details！</p>
+<h2>安装 Nginx Proxy 和 Lets-Encrypt</h2>
+<p>Check https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion for details！</p>
 <p><em>下列操作均由 root 用户完成。</em></p>
 <p>1) 首先弄个 Docker 设置目录，建立 docker 用戶組，並添加你的管理員帳號到 docker 組</p>
 <div class="highlight"><pre><span></span>mkdir -p /etc/docker/certs
@@ -182,8 +182,8 @@ systemctl <span class="nb">enable</span> docker@nginx-letsencrypt
 </pre></div>
 
 
-<p>=== 安装 Transmission (作为 Seedbox)
-建立 Transmission 目录</p>
+<h2>安装 Transmission (作为 Seedbox)</h2>
+<p>建立 Transmission 目录</p>
 <div class="highlight"><pre><span></span>mkdir -p /opt/transmission
 </pre></div>
 
@@ -226,8 +226,8 @@ firewall-cmd --reload
 </pre></div>
 
 
-<p>=== 安装 Seafile (作为私有云)
-详见 https://github.com/coeusite/docker-seafile</p>
+<h2>安装 Seafile (作为私有云)</h2>
+<p>详见 https://github.com/coeusite/docker-seafile</p>
 <p>建立后台 MariaDB 数据库</p>
 <div class="highlight"><pre><span></span>docker volume create --name seafile-dbstore
 

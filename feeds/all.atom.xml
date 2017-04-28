@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>CosueITE Closet</title><link href="https://lettuce.schwarzdot.eu.org/" rel="alternate"></link><link href="https://lettuce.schwarzdot.eu.org/feeds/all.atom.xml" rel="self"></link><id>https://lettuce.schwarzdot.eu.org/</id><updated>2017-04-28T00:00:00+08:00</updated><entry><title>在新 Dedibox 上部署 Docker</title><link href="https://lettuce.schwarzdot.eu.org/Docker%20Containers%20on%20My%20Dedibox.html" rel="alternate"></link><published>2016-09-27T00:00:00+08:00</published><updated>2017-04-28T00:00:00+08:00</updated><author><name>CoeusITE</name></author><id>tag:lettuce.schwarzdot.eu.org,2016-09-27:/Docker Containers on My Dedibox.html</id><summary type="html">&lt;p&gt;在 Dedibox 上部署 Docker 全记录&lt;/p&gt;</summary><content type="html">&lt;p&gt;刚刚 Online.net 又开卖 Limited Dediboxes，虽然这次很没诚意，但我还是买了个 C2750/1TB 的。
+<feed xmlns="http://www.w3.org/2005/Atom"><title>CosueITE's Closet</title><link href="https://lettuce.schwarzdot.eu.org/" rel="alternate"></link><link href="https://lettuce.schwarzdot.eu.org/feeds/all.atom.xml" rel="self"></link><id>https://lettuce.schwarzdot.eu.org/</id><updated>2017-04-28T00:00:00+08:00</updated><entry><title>在新 Dedibox 上部署 Docker</title><link href="https://lettuce.schwarzdot.eu.org/Docker%20Containers%20on%20My%20Dedibox.html" rel="alternate"></link><published>2016-09-27T00:00:00+08:00</published><updated>2017-04-28T00:00:00+08:00</updated><author><name>CoeusITE</name></author><id>tag:lettuce.schwarzdot.eu.org,2016-09-27:/Docker Containers on My Dedibox.html</id><summary type="html">&lt;p&gt;在 Dedibox 上部署 Docker 全记录&lt;/p&gt;</summary><content type="html">&lt;p&gt;刚刚 Online.net 又开卖 Limited Dediboxes，虽然这次很没诚意，但我还是买了个 C2750/1TB 的。
 买后犹豫再三，还是安装了 Fedora 24 而非 Centos 7 或 Debian 8，原因大约是 Fedora 更新快。&lt;/p&gt;
 &lt;p&gt;后来，Online.net 又开卖 Limited Dediboxes，没忍住换了一个E3/2TB的，系统更新为 Fedora 25。&lt;/p&gt;
 &lt;p&gt;言归正传，下面开始部署 Docker。&lt;/p&gt;
-&lt;p&gt;== Docker 安装
-Check https://fedoraproject.org/wiki/Docker for details!&lt;/p&gt;
+&lt;h1&gt;Docker 安装&lt;/h1&gt;
+&lt;p&gt;Check https://fedoraproject.org/wiki/Docker for details!&lt;/p&gt;
 &lt;p&gt;首先更新个系统:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo dnf -y update
 &lt;/pre&gt;&lt;/div&gt;
@@ -39,7 +39,7 @@ sudo systemctl &lt;span class="nb"&gt;enable&lt;/span&gt; --now docker
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;== 安装各个应用&lt;/p&gt;
+&lt;h2&gt;安装各个应用&lt;/h2&gt;
 &lt;p&gt;显示目前运行的容器:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo docker info
 &lt;/pre&gt;&lt;/div&gt;
@@ -50,8 +50,8 @@ sudo systemctl &lt;span class="nb"&gt;enable&lt;/span&gt; --now docker
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;=== 安装 Nginx Proxy 和 Lets-Encrypt
-Check https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion for details！&lt;/p&gt;
+&lt;h2&gt;安装 Nginx Proxy 和 Lets-Encrypt&lt;/h2&gt;
+&lt;p&gt;Check https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion for details！&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;下列操作均由 root 用户完成。&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;1) 首先弄个 Docker 设置目录，建立 docker 用戶組，並添加你的管理員帳號到 docker 組&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;mkdir -p /etc/docker/certs
@@ -145,8 +145,8 @@ systemctl &lt;span class="nb"&gt;enable&lt;/span&gt; docker@nginx-letsencrypt
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;=== 安装 Transmission (作为 Seedbox)
-建立 Transmission 目录&lt;/p&gt;
+&lt;h2&gt;安装 Transmission (作为 Seedbox)&lt;/h2&gt;
+&lt;p&gt;建立 Transmission 目录&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;mkdir -p /opt/transmission
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -189,8 +189,8 @@ firewall-cmd --reload
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;=== 安装 Seafile (作为私有云)
-详见 https://github.com/coeusite/docker-seafile&lt;/p&gt;
+&lt;h2&gt;安装 Seafile (作为私有云)&lt;/h2&gt;
+&lt;p&gt;详见 https://github.com/coeusite/docker-seafile&lt;/p&gt;
 &lt;p&gt;建立后台 MariaDB 数据库&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;docker volume create --name seafile-dbstore
 
