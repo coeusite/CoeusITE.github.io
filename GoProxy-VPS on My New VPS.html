@@ -2,8 +2,8 @@
 <html lang="cn">
 <head>
         <meta charset="utf-8" />
-        <title>The Closet of CoeusITE - Post</title>
-        <link rel="stylesheet" href="../theme/css/main.css" />
+        <title>在 VPS 上部署 TLS1.3 + HTTP/2 代理</title>
+        <link rel="stylesheet" href="./theme/css/main.css" />
 
         <!--[if IE]>
             <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -12,26 +12,31 @@
 
 <body id="index" class="home">
         <header id="banner" class="body">
-                <h1><a href="../">The Closet of CoeusITE </a></h1>
+                <h1><a href="./">The Closet of CoeusITE </a></h1>
                 <nav><ul>
-                    <li class="active"><a href="../category/post.html">Post</a></li>
+                    <li class="active"><a href="./category/post.html">Post</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="./GoProxy-VPS on My New VPS.html" rel="bookmark"
+           title="Permalink to 在 VPS 上部署 TLS1.3 + HTTP/2 代理">在 VPS 上部署 TLS1.3 + HTTP/2 代理</a></h1>
+    </header>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="../GoProxy-VPS on My New VPS.html">在 VPS 上部署 TLS1.3 + HTTP/2 代理</a></h1>
+    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2017-05-11T00:00:00+08:00">
                 Published: Thu 11 May 2017
         </abbr>
 
         <address class="vcard author">
-                By                         <a class="url fn" href="../author/coeusite.html">CoeusITE</a>
+                By                         <a class="url fn" href="./author/coeusite.html">CoeusITE</a>
         </address>
-<p>In <a href="../category/post.html">Post</a>.</p>
-<p>tags: <a href="../tag/goproxy-vps.html">GoProxy-VPS</a> <a href="../tag/proxy.html">Proxy</a> <a href="../tag/http2.html">HTTP/2</a> <a href="../tag/tls13.html">TLS1.3</a> </p>
-</footer><!-- /.post-info --><h1>1. 前言</h1>
+<p>In <a href="./category/post.html">Post</a>.</p>
+<p>tags: <a href="./tag/goproxy-vps.html">GoProxy-VPS</a> <a href="./tag/proxy.html">Proxy</a> <a href="./tag/http2.html">HTTP/2</a> <a href="./tag/tls13.html">TLS1.3</a> </p>
+</footer><!-- /.post-info -->      <h1>1. 前言</h1>
 <p>最近新入了一个Virmach VPS/US，作为跳板之用，并陆续在其上部署了SS和SSR，而后便本着“反正闲着也是闲着”的想法，打算再部署一个 HTTP/2 Proxy。</p>
 <p>最初的打算是用 <strong>nghttpx</strong>，可以参考<a href="https://wzyboy.im/post/1052.html">wzyboy's previous post</a>，但是以前玩过这个，不想再重复一遍。之后意外发现了 <strong>goproxy-vps</strong>，相信说明见<a href="https://github.com/phuslu/goproxy/issues/1470">这个 Github Issue</a>，故决定进行一下尝试。</p>
 <h1>2. 基本搭建过程</h1>
@@ -109,40 +114,11 @@ proxy_builtin_auth = {test=&quot;123456&quot;, user=&quot;password&quot;}
 
 
 <h2>证书认证</h2>
-<p>未支持</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+<p>未支持</p>
+    </div><!-- /.entry-content -->
 
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="../Docker Containers on My Dedibox.html" rel="bookmark"
-                           title="Permalink to 在新 Dedibox 上部署 Docker">在新 Dedibox 上部署 Docker</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2016-09-27T00:00:00+08:00">
-                Published: Tue 27 September 2016
-        </abbr>
-		<br />
-        <abbr class="modified" title="2017-04-28T00:00:00+08:00">
-                Updated: Fri 28 April 2017
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="../author/coeusite.html">CoeusITE</a>
-        </address>
-<p>In <a href="../category/post.html">Post</a>.</p>
-<p>tags: <a href="../tag/docker.html">Docker</a> <a href="../tag/dedibox.html">Dedibox</a> <a href="../tag/onlinenet.html">Online.net</a> <a href="../tag/transmission.html">Transmission</a> <a href="../tag/seafile.html">Seafile</a> <a href="../tag/lets-encrypt.html">Lets-Encrypt</a> </p>
-</footer><!-- /.post-info -->                <p>在 Dedibox 上部署 Docker 全记录</p>
-                <a class="readmore" href="../Docker Containers on My Dedibox.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
+  </article>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>links</h2>
