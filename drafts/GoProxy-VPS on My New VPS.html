@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="cn">
+<head>
+        <meta charset="utf-8" />
+        <title>在 VPS 上部署 TLS1.3 + HTTP/2 代理</title>
+        <link rel="stylesheet" href="../theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="../">The Closet of CoeusITE </a></h1>
+                <nav><ul>
+                    <li class="active"><a href="../category/post.html">Post</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="../drafts/GoProxy-VPS on My New VPS.html" rel="bookmark"
+           title="Permalink to 在 VPS 上部署 TLS1.3 + HTTP/2 代理">在 VPS 上部署 TLS1.3 + HTTP/2 代理</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-05-11T00:00:00+08:00">
+                Published: Thu 11 May 2017
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="../author/coeusite.html">CoeusITE</a>
+        </address>
+<p>In <a href="../category/post.html">Post</a>.</p>
+<p>tags: <a href="../tag/goproxy-vps.html">GoProxy-VPS</a> <a href="../tag/proxy.html">Proxy</a> <a href="../tag/http2.html">HTTP/2</a> <a href="../tag/tls13.html">TLS1.3</a> </p>
+</footer><!-- /.post-info -->      <h1>1. 前言</h1>
+<p>最近新入了一个Virmach VPS/US，作为跳板之用，并陆续在其上部署了SS和SSR，而后便本着“反正闲着也是闲着”的想法，打算再部署一个 HTTP/2 Proxy。</p>
+<p>最初的打算是用 <strong>nghttpx</strong>，可以参考<a href="https://wzyboy.im/post/1052.html">wzyboy's previous post</a>，但是以前玩过这个，不想再重复一遍。之后意外发现了 <strong>goproxy-vps</strong>，相信说明见<a href="https://github.com/phuslu/goproxy/issues/1470">这个 Github Issue</a>，故决定进行一下尝试。</p>
+<h1>2. 基本搭建过程</h1>
+<p>VPS 基础信息：Debian Jessie w/ Backports on KVM VPS w/ 512M RAM</p>
+<h2>2.1 下载 goproxy-vps 到 /opt</h2>
+<div class="highlight"><pre><span></span><span class="nb">cd</span> /opt
+curl -L https://git.io/get-goproxy-vps <span class="p">|</span> bash
+</pre></div>
+
+
+<h2>2.2 配置 goproxy-vps.toml 文件</h2>
+<p>可以直接用这个模板覆盖，也可以自行修改 <code>goproxy-vps.toml</code>。</p>
+<div class="highlight"><pre><span></span><span class="nv">server_name</span><span class="o">=</span><span class="s1">&#39;你的服务器名称，如 example.com&#39;</span>
+<span class="nv">fallback_address</span><span class="o">=</span><span class="s1">&#39;你的回落地址，如 https://example.github.io 或 file://var/www/html&#39;</span>
+<span class="nv">username</span><span class="o">=</span><span class="s1">&#39;你的用户名&#39;</span>
+<span class="nv">password</span><span class="o">=</span><span class="s1">&#39;你的密码&#39;</span>
+
+cat <span class="s">&lt;&lt;EOF &gt;/opt/goproxy-vps/goproxy-vps.toml</span>
+<span class="s">[default]</span>
+<span class="s">log_level = 2</span>
+<span class="s">reject_nil_sni = false</span>
+<span class="s">daemon_stderr = &quot;/opt/goproxy-vps/goproxy-vps.log&quot;</span>
+
+<span class="s">[[http2]]</span>
+<span class="s">listen = &quot;:443&quot;</span>
+<span class="s">server_name = [&quot;${server_name}&quot;]</span>
+<span class="s">proxy_fallback = &quot;${fallback_address}&quot;</span>
+<span class="s">proxy_auth_method = &quot;builtin&quot;</span>
+<span class="s">proxy_builtin_auth = {test=&quot;${password}&quot;, user=&quot;${username}&quot;}</span>
+
+<span class="s">[[https]]</span>
+<span class="s">listen = &quot;:443&quot;</span>
+<span class="s">server_name = [&quot;${server_name}&quot;]</span>
+<span class="s">proxy_fallback = &quot;${fallback_address}&quot;</span>
+<span class="s">proxy_auth_method = &quot;builtin&quot;</span>
+<span class="s">proxy_builtin_auth = {test=&quot;${password}&quot;, user=&quot;${username}&quot;}</span>
+<span class="s">EOF</span>
+</pre></div>
+
+
+<h2>2.3 配置 systemd</h2>
+<p>添加 service 文件</p>
+<div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt;EOF &gt;/etc/systemd/system/goproxy-vps.service</span>
+<span class="s">[Unit]</span>
+<span class="s">Description=GoProxy Server Service by phuslu@github</span>
+<span class="s">After=network.target</span>
+
+<span class="s">[Service]</span>
+<span class="s">Type=simple</span>
+<span class="s">WorkingDirectory=/opt/goproxy-vps/</span>
+<span class="s">ExecStart=/opt/goproxy-vps/goproxy-vps</span>
+
+<span class="s">[Install]</span>
+<span class="s">WantedBy=multi-user.target</span>
+<span class="s">EOF</span>
+</pre></div>
+
+
+<p>开启自动运行</p>
+<div class="highlight"><pre><span></span>systemctl <span class="nb">enable</span> --now goproxy-vps
+</pre></div>
+
+
+<h1>3. 鉴权</h1>
+<p>支持的鉴权包括：</p>
+<h2>PAM</h2>
+<div class="highlight"><pre><span></span>proxy_auth_method = &quot;
+</pre></div>
+
+
+<h2>内置账户密码</h2>
+<div class="highlight"><pre><span></span>proxy_auth_method = &quot;builtin&quot;
+proxy_builtin_auth = {test=&quot;123456&quot;, user=&quot;password&quot;}
+</pre></div>
+
+
+<h2>证书认证</h2>
+<p>未支持</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://getpelican.com/">Pelican</a></li>
+                            <li><a href="https://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

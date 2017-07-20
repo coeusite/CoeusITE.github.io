@@ -20,109 +20,7 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="./GoProxy-VPS on My New VPS.html">在 VPS 上部署 TLS1.3 + HTTP/2 代理</a></h1>
-<footer class="post-info">
-        <abbr class="published" title="2017-05-11T00:00:00+08:00">
-                Published: Thu 11 May 2017
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="./author/coeusite.html">CoeusITE</a>
-        </address>
-<p>In <a href="./category/post.html">Post</a>.</p>
-<p>tags: <a href="./tag/goproxy-vps.html">GoProxy-VPS</a> <a href="./tag/proxy.html">Proxy</a> <a href="./tag/http2.html">HTTP/2</a> <a href="./tag/tls13.html">TLS1.3</a> </p>
-</footer><!-- /.post-info --><h1>1. 前言</h1>
-<p>最近新入了一个Virmach VPS/US，作为跳板之用，并陆续在其上部署了SS和SSR，而后便本着“反正闲着也是闲着”的想法，打算再部署一个 HTTP/2 Proxy。</p>
-<p>最初的打算是用 <strong>nghttpx</strong>，可以参考<a href="https://wzyboy.im/post/1052.html">wzyboy's previous post</a>，但是以前玩过这个，不想再重复一遍。之后意外发现了 <strong>goproxy-vps</strong>，相信说明见<a href="https://github.com/phuslu/goproxy/issues/1470">这个 Github Issue</a>，故决定进行一下尝试。</p>
-<h1>2. 基本搭建过程</h1>
-<p>VPS 基础信息：Debian Jessie w/ Backports on KVM VPS w/ 512M RAM</p>
-<h2>2.1 下载 goproxy-vps 到 /opt</h2>
-<div class="highlight"><pre><span></span><span class="nb">cd</span> /opt
-curl -L https://git.io/get-goproxy-vps <span class="p">|</span> bash
-</pre></div>
-
-
-<h2>2.2 配置 goproxy-vps.toml 文件</h2>
-<p>可以直接用这个模板覆盖，也可以自行修改 <code>goproxy-vps.toml</code>。</p>
-<div class="highlight"><pre><span></span><span class="nv">server_name</span><span class="o">=</span><span class="s1">&#39;你的服务器名称，如 example.com&#39;</span>
-<span class="nv">fallback_address</span><span class="o">=</span><span class="s1">&#39;你的回落地址，如 https://example.github.io 或 file://var/www/html&#39;</span>
-<span class="nv">username</span><span class="o">=</span><span class="s1">&#39;你的用户名&#39;</span>
-<span class="nv">password</span><span class="o">=</span><span class="s1">&#39;你的密码&#39;</span>
-
-cat <span class="s">&lt;&lt;EOF &gt;/opt/goproxy-vps/goproxy-vps.toml</span>
-<span class="s">[default]</span>
-<span class="s">log_level = 2</span>
-<span class="s">reject_nil_sni = false</span>
-<span class="s">daemon_stderr = &quot;/opt/goproxy-vps/goproxy-vps.log&quot;</span>
-
-<span class="s">[[http2]]</span>
-<span class="s">listen = &quot;:443&quot;</span>
-<span class="s">server_name = [&quot;${server_name}&quot;]</span>
-<span class="s">proxy_fallback = &quot;${fallback_address}&quot;</span>
-<span class="s">proxy_auth_method = &quot;builtin&quot;</span>
-<span class="s">proxy_builtin_auth = {test=&quot;${password}&quot;, user=&quot;${username}&quot;}</span>
-
-<span class="s">[[https]]</span>
-<span class="s">listen = &quot;:443&quot;</span>
-<span class="s">server_name = [&quot;${server_name}&quot;]</span>
-<span class="s">proxy_fallback = &quot;${fallback_address}&quot;</span>
-<span class="s">proxy_auth_method = &quot;builtin&quot;</span>
-<span class="s">proxy_builtin_auth = {test=&quot;${password}&quot;, user=&quot;${username}&quot;}</span>
-<span class="s">EOF</span>
-</pre></div>
-
-
-<h2>2.3 配置 systemd</h2>
-<p>添加 service 文件</p>
-<div class="highlight"><pre><span></span>cat <span class="s">&lt;&lt;EOF &gt;/etc/systemd/system/goproxy-vps.service</span>
-<span class="s">[Unit]</span>
-<span class="s">Description=GoProxy Server Service by phuslu@github</span>
-<span class="s">After=network.target</span>
-
-<span class="s">[Service]</span>
-<span class="s">Type=simple</span>
-<span class="s">WorkingDirectory=/opt/goproxy-vps/</span>
-<span class="s">ExecStart=/opt/goproxy-vps/goproxy-vps</span>
-
-<span class="s">[Install]</span>
-<span class="s">WantedBy=multi-user.target</span>
-<span class="s">EOF</span>
-</pre></div>
-
-
-<p>开启自动运行</p>
-<div class="highlight"><pre><span></span>systemctl <span class="nb">enable</span> --now goproxy-vps
-</pre></div>
-
-
-<h1>3. 鉴权</h1>
-<p>支持的鉴权包括：</p>
-<h2>PAM</h2>
-<div class="highlight"><pre><span></span>proxy_auth_method = &quot;
-</pre></div>
-
-
-<h2>内置账户密码</h2>
-<div class="highlight"><pre><span></span>proxy_auth_method = &quot;builtin&quot;
-proxy_builtin_auth = {test=&quot;123456&quot;, user=&quot;password&quot;}
-</pre></div>
-
-
-<h2>证书认证</h2>
-<p>未支持</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="./Docker Containers on My Dedibox.html" rel="bookmark"
-                           title="Permalink to 在新 Dedibox 上部署 Docker">在新 Dedibox 上部署 Docker</a></h1>
-                </header>
-
-                <div class="entry-content">
+                    <h1 class="entry-title"><a href="./Docker Containers on My Dedibox.html">在新 Dedibox 上部署 Docker</a></h1>
 <footer class="post-info">
         <abbr class="published" title="2016-09-27T00:00:00+08:00">
                 Published: Tue 27 September 2016
@@ -137,12 +35,256 @@ proxy_builtin_auth = {test=&quot;123456&quot;, user=&quot;password&quot;}
         </address>
 <p>In <a href="./category/post.html">Post</a>.</p>
 <p>tags: <a href="./tag/docker.html">Docker</a> <a href="./tag/dedibox.html">Dedibox</a> <a href="./tag/onlinenet.html">Online.net</a> <a href="./tag/transmission.html">Transmission</a> <a href="./tag/seafile.html">Seafile</a> <a href="./tag/lets-encrypt.html">Lets-Encrypt</a> </p>
-</footer><!-- /.post-info -->                <p>在 Dedibox 上部署 Docker 全记录</p>
-                <a class="readmore" href="./Docker Containers on My Dedibox.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
+</footer><!-- /.post-info --><p>刚刚 Online.net 又开卖 Limited Dediboxes，虽然这次很没诚意，但我还是买了个 C2750/1TB 的。
+买后犹豫再三，还是安装了 Fedora 24 而非 Centos 7 或 Debian 8，原因大约是 Fedora 更新快。</p>
+<p>后来，Online.net 又开卖 Limited Dediboxes，没忍住换了一个E3/2TB的，系统更新为 Fedora 25。</p>
+<p>言归正传，下面开始部署 Docker。</p>
+<h1>Docker 安装</h1>
+<p>Check https://fedoraproject.org/wiki/Docker for details!</p>
+<p>首先更新个系统:</p>
+<div class="highlight"><pre><span></span>sudo dnf -y update
+</pre></div>
+
+
+<p>然后安装 Docker，并设置好开机启动顺便启动 Docker:</p>
+<div class="highlight"><pre><span></span>sudo dnf -y install docker
+sudo systemctl <span class="nb">enable</span> --now docker
+</pre></div>
+
+
+<p>测试下 Docker 是否正常运行:</p>
+<div class="highlight"><pre><span></span>sudo docker info
+</pre></div>
+
+
+<p>然后建立用于自动启动 Docker Container 的 Systemd Service 文件：</p>
+<div class="highlight"><pre><span></span>sudo tee /etc/systemd/system/docker@.service <span class="s">&lt;&lt;-&#39;EOF&#39;</span>
+<span class="s">[Unit]</span>
+<span class="s">Description=General systemd service profile for one docker container</span>
+<span class="s">Requires=docker.service</span>
+<span class="s">After=docker.service</span>
+
+<span class="s">[Service]</span>
+<span class="s">Restart=always</span>
+<span class="s">ExecStart=/usr/bin/docker start -a %i</span>
+<span class="s">ExecStop=/usr/bin/docker stop -t 2 %i</span>
+
+<span class="s">[Install]</span>
+<span class="s">WantedBy=multi-user.target</span>
+<span class="s">EOF</span>
+</pre></div>
+
+
+<h2>安装各个应用</h2>
+<p>显示目前运行的容器:</p>
+<div class="highlight"><pre><span></span>sudo docker info
+</pre></div>
+
+
+<p>显示现有的全部容器:</p>
+<div class="highlight"><pre><span></span>sudo docker info -a
+</pre></div>
+
+
+<h2>安装 Nginx Proxy 和 Lets-Encrypt</h2>
+<p>Check https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion for details！</p>
+<p><em>下列操作均由 root 用户完成。</em></p>
+<p>1) 首先弄个 Docker 设置目录，建立 docker 用戶組，並添加你的管理員帳號到 docker 組</p>
+<div class="highlight"><pre><span></span>mkdir -p /etc/docker/certs
+chmod <span class="m">700</span> /etc/docker/certs
+
+groupadd docker
+usermod -a -G docker YOUR_ADMIN_ACCOUNT
+</pre></div>
+
+
+<p>2) 然后下载 Nginx 的模板文件</p>
+<div class="highlight"><pre><span></span>wget https://github.com/jwilder/nginx-proxy/raw/master/nginx.tmpl -O /etc/docker/nginx.tmpl
+</pre></div>
+
+
+<p>3) 新建一個 bridge 網絡，並新建一个官方的 Nginx Container，用于实际运行 Nginx</p>
+<div class="highlight"><pre><span></span>docker network create --subnet<span class="o">=</span><span class="m">172</span>.23.39.0/24 nginx-proxy
+
+docker run -d -p <span class="m">80</span>:80 -p <span class="m">443</span>:443 <span class="se">\</span>
+    --name nginx --network nginx-proxy <span class="se">\</span>
+    -v /etc/nginx/conf.d  <span class="se">\</span>
+    -v /etc/nginx/vhost.d <span class="se">\</span>
+    -v /usr/share/nginx/html <span class="se">\</span>
+    -v /etc/docker/certs:/etc/nginx/certs:ro <span class="se">\</span>
+    nginx
+</pre></div>
+
+
+<p>4) 运行一个 docker-gen Container，用于设置 Nginx 的配置文件</p>
+<div class="highlight"><pre><span></span>docker run -d <span class="se">\</span>
+    --name nginx-gen --network nginx-proxy <span class="se">\</span>
+    --volumes-from nginx <span class="se">\</span>
+    -v /etc/docker/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro <span class="se">\</span>
+    -v /var/run/docker.sock:/tmp/docker.sock:ro <span class="se">\</span>
+    jwilder/docker-gen <span class="se">\</span>
+    -notify-sighup nginx -watch -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
+</pre></div>
+
+
+<p>5) 运行用于生成 Lets-Encrypt 证书的 letsencrypt-nginx-proxy-companion Container</p>
+<div class="highlight"><pre><span></span>docker run -d <span class="se">\</span>
+    --name nginx-letsencrypt --network nginx-proxy <span class="se">\</span>
+    -e <span class="s2">&quot;NGINX_DOCKER_GEN_CONTAINER=nginx-gen&quot;</span> <span class="se">\</span>
+    --volumes-from nginx <span class="se">\</span>
+    -v /etc/docker/certs:/etc/nginx/certs:rw <span class="se">\</span>
+    -v /var/run/docker.sock:/var/run/docker.sock:ro <span class="se">\</span>
+    jrcs/letsencrypt-nginx-proxy-companion
+</pre></div>
+
+
+<p>6) 开启 firewalld 端口：</p>
+<div class="highlight"><pre><span></span>firewall-cmd --add-service<span class="o">=</span>https --add-service<span class="o">=</span>http --permanent
+firewall-cmd --reload
+</pre></div>
+
+
+<p>7) 开启开机启动：</p>
+<div class="highlight"><pre><span></span>tee /etc/systemd/system/docker@nginx-gen.service <span class="s">&lt;&lt;-&#39;EOF&#39;</span>
+<span class="s">[Unit]</span>
+<span class="s">Description=General systemd service profile for one docker container</span>
+<span class="s">Requires=docker.service docker@nginx.service</span>
+<span class="s">After=docker.service</span>
+
+<span class="s">[Service]</span>
+<span class="s">Restart=always</span>
+<span class="s">ExecStart=/usr/bin/docker start -a nginx-gen</span>
+<span class="s">ExecStop=/usr/bin/docker stop -t 2 nginx-gen</span>
+
+<span class="s">[Install]</span>
+<span class="s">WantedBy=multi-user.target</span>
+<span class="s">EOF</span>
+
+tee /etc/systemd/system/docker@nginx-letsencrypt.service <span class="s">&lt;&lt;-&#39;EOF&#39;</span>
+<span class="s">[Unit]</span>
+<span class="s">Description=General systemd service profile for one docker container</span>
+<span class="s">Requires=docker.service docker@nginx.service docker@nginx-gen.service</span>
+<span class="s">After=docker.service</span>
+
+<span class="s">[Service]</span>
+<span class="s">Restart=always</span>
+<span class="s">ExecStart=/usr/bin/docker start -a nginx-letsencrypt</span>
+<span class="s">ExecStop=/usr/bin/docker stop -t 2 nginx-letsencrypt</span>
+
+<span class="s">[Install]</span>
+<span class="s">WantedBy=multi-user.target</span>
+<span class="s">EOF</span>
+
+systemctl <span class="nb">enable</span> docker@nginx
+systemctl <span class="nb">enable</span> docker@nginx-gen
+systemctl <span class="nb">enable</span> docker@nginx-letsencrypt
+</pre></div>
+
+
+<h2>安装 Transmission (作为 Seedbox)</h2>
+<p>建立 Transmission 目录</p>
+<div class="highlight"><pre><span></span>mkdir -p /opt/transmission
+</pre></div>
+
+
+<p>运行 Docker Container (Transmission 2.9.2 based on Debian:Stretch)</p>
+<div class="highlight"><pre><span></span>docker run -it --name transmission -p <span class="m">127</span>.0.0.1:9091:9091 <span class="se">\</span>
+            --network nginx-proxy <span class="se">\</span>
+            -p <span class="m">51413</span>:51413/tcp -p <span class="m">51413</span>:51413/udp <span class="se">\</span>
+            -v /opt/transmission:/var/lib/transmission-daemon <span class="se">\</span>
+            -e <span class="s2">&quot;TR_PEX_ENABLED=false&quot;</span> <span class="se">\</span>
+            -e <span class="s2">&quot;TR_LPD_ENABLED=false&quot;</span> <span class="se">\</span>
+            -e <span class="s2">&quot;TR_DHT_ENABLED=false&quot;</span> <span class="se">\</span>
+            -e <span class="s2">&quot;TR_DOWNLOAD_DIR=/var/lib/transmission-daemon/downloads&quot;</span> <span class="se">\</span>
+            -e <span class="s2">&quot;TR_INCOMPLETE_DIR=/var/lib/transmission-daemon/incomplete&quot;</span> <span class="se">\</span>
+            -e <span class="s2">&quot;TR_INCOMPLETE_DIR_ENABLED=true&quot;</span> <span class="se">\</span>
+            -e <span class="s2">&quot;TRUSER=&lt;Your Username for Auth&gt;&quot;</span> <span class="se">\</span>
+            -e <span class="s2">&quot;TRPASSWD=&lt;Your Passcode for Auth&gt;&quot;</span> <span class="se">\</span>
+            -e <span class="s2">&quot;VIRTUAL_HOST=&lt;your.host.name&gt;&quot;</span> <span class="se">\</span>
+            -e <span class="s2">&quot;VIRTUAL_PORT=9091&quot;</span> <span class="se">\</span>
+            -e <span class="s2">&quot;LETSENCRYPT_HOST=&lt;your.host.name&gt;&quot;</span> <span class="se">\</span>
+            -e <span class="s2">&quot;LETSENCRYPT_EMAIL=your@email&quot;</span> <span class="se">\</span>
+            -d coeusite/docker-transmission
+</pre></div>
+
+
+<p><em>注意自己设置域名(VIRTUAL_HOST &amp; LETSENCRYPT_HOST)、邮箱(LETSENCRYPT_EMAIL)、用户名(TRUSER)和密码(TRPASSWD)</em></p>
+<p>安装 https://github.com/ronggang/transmission-web-control[Transmission Web Control]</p>
+<div class="highlight"><pre><span></span>docker <span class="nb">exec</span> transmission /root/install-tr-web-control.sh
+</pre></div>
+
+
+<p>开启 firewalld 端口：</p>
+<div class="highlight"><pre><span></span>firewall-cmd --add-port<span class="o">=</span><span class="m">51413</span>/tcp --add-port<span class="o">=</span><span class="m">51413</span>/udp --permanent
+firewall-cmd --reload
+</pre></div>
+
+
+<p>开启开机启动：</p>
+<div class="highlight"><pre><span></span>systemctl <span class="nb">enable</span> docker@transmission
+</pre></div>
+
+
+<h2>安装 Seafile (作为私有云)</h2>
+<p>详见 https://github.com/coeusite/docker-seafile</p>
+<p>建立后台 MariaDB 数据库</p>
+<div class="highlight"><pre><span></span>docker volume create --name seafile-dbstore
+
+docker run -d -p <span class="m">127</span>.0.0.1:3306:3306 <span class="se">\</span>
+  --network nginx-proxy --ip <span class="m">172</span>.23.39.98 <span class="se">\</span>
+  -v seafile-dbstore:/var/lib/mysql:rw <span class="se">\</span>
+  -e <span class="nv">MYSQL_ROOT_PASSWORD</span><span class="o">=</span>&lt;password&gt; <span class="se">\</span>
+  -e <span class="nv">MYSQL_DATABASE</span><span class="o">=</span>seafile <span class="se">\</span>
+  -e <span class="nv">MYSQL_USER</span><span class="o">=</span>seafile <span class="se">\</span>
+  -e <span class="nv">MYSQL_PASSWORD</span><span class="o">=</span>&lt;password&gt; <span class="se">\</span>
+  --name seafile-db mariadb:latest
+</pre></div>
+
+
+<p>建立 Seafile 数据 Container</p>
+<div class="highlight"><pre><span></span>docker run -it --dns<span class="o">=</span><span class="m">127</span>.0.0.1 <span class="se">\</span>
+  --network nginx-proxy --ip <span class="m">172</span>.23.39.99 <span class="se">\</span>
+  -e <span class="nv">SEAFILE_DOMAIN_NAME</span><span class="o">=</span>&lt;YOUR.HOST.NAME&gt; <span class="se">\</span>
+  --name seafile-data coeusite/docker-seafile:latest  bootstrap
+</pre></div>
+
+
+<p>建立 Seafile 运行 Container</p>
+<div class="highlight"><pre><span></span>docker run -d -t --dns<span class="o">=</span><span class="m">127</span>.0.0.1 -p <span class="m">127</span>.0.0.1:8080:8080 <span class="se">\</span>
+            --network nginx-proxy --ip <span class="m">172</span>.23.39.99 <span class="se">\</span>
+            --volumes-from seafile-data <span class="se">\</span>
+            -e <span class="nv">SEAFILE_DOMAIN_NAME</span><span class="o">=</span>&lt;YOUR.HOST.NAME&gt; <span class="se">\</span>
+            -e <span class="s2">&quot;VIRTUAL_HOST=&lt;YOUR.HOST.NAME&gt;&quot;</span> <span class="se">\</span>
+            -e <span class="s2">&quot;VIRTUAL_PORT=8080&quot;</span> <span class="se">\</span>
+            -e <span class="s2">&quot;VIRTUAL_PROTO=https&quot;</span> <span class="se">\</span>
+            -e <span class="s2">&quot;LETSENCRYPT_HOST=&lt;YOUR.HOST.NAME&gt;&quot;</span> <span class="se">\</span>
+            -e <span class="s2">&quot;LETSENCRYPT_EMAIL=&lt;YOUR@EMAIL&gt;&quot;</span> <span class="se">\</span>
+            --name seafile coeusite/docker-seafile
+</pre></div>
+
+
+<p>然后就可以通过 https://<YOUR.HOST.NAME> 访问 Seafile 了！
+不过现在还需要去后台修正一下端口，从8080修改为443。</p>
+<p>开启开机启动：</p>
+<div class="highlight"><pre><span></span>tee /etc/systemd/system/docker@seafile.service <span class="s">&lt;&lt;-&#39;EOF&#39;</span>
+<span class="s">[Unit]</span>
+<span class="s">Description=General systemd service profile for one docker container</span>
+<span class="s">Requires=docker.service docker@seafile-db.service</span>
+<span class="s">After=docker.service</span>
+
+<span class="s">[Service]</span>
+<span class="s">Restart=always</span>
+<span class="s">ExecStart=/usr/bin/docker start -a seafile</span>
+<span class="s">ExecStop=/usr/bin/docker stop -t 2 seafile</span>
+
+<span class="s">[Install]</span>
+<span class="s">WantedBy=multi-user.target</span>
+<span class="s">EOF</span>
+
+systemctl <span class="nb">enable</span> docker@seafile-db
+systemctl <span class="nb">enable</span> docker@seafile
+</pre></div>                </article>
+            </aside><!-- /#featured -->
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>links</h2>
